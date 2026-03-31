@@ -101,7 +101,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 import uuid
 
-BASE_URL = "https://yourusername.pythonanywhere.com"
+BASE_URL = "https://sendermailing.pythonanywhere.com"
 
 def send_tracking_email(to_email, tracking_id):
 
