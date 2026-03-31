@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Tracker</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background: #f4f4f4; }
+        .yes { color: green; font-weight: bold; }
+        .no { color: red; }
+    </style>
+</head>
+<body>
+
+<h2>Email Tracking Dashboard</h2>
+
+<table>
+    <tr>
+        <th>Email</th>
+        <th>Opened</th>
+        <th>Clicked</th>
+        <th>Sent Time</th>
+    </tr>
+
+    {% for item in data %}
+    <tr>
+        <td>{{ item.email }}</td>
+
+        <td>
+            {% if item.opened %}
+                <span class="yes">✔ Opened</span>
+            {% else %}
+                <span class="no">✘ Not Opened</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if item.clicked %}
+                <span class="yes">✔ Clicked</span>
+            {% else %}
+                <span class="no">✘ Not Clicked</span>
+            {% endif %}
+        </td>
+
+        <td>{{ item.sent_at }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>

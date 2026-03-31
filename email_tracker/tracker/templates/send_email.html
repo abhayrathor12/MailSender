@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Tracker</title>
+</head>
+<body>
+
+<h2>Email Tracking Test</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="email"
+           name="email"
+           placeholder="Enter Gmail"
+           required
+           style="padding:10px;width:300px">
+
+    <button type="submit"
+            style="padding:10px 20px">
+        Send Tracking Email
+    </button>
+
+</form>
+
+</body>
+</html>
