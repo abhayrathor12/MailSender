@@ -14,11 +14,19 @@ def get_pixel():
     )
     return pixel
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
+
 
 def track_open(request, tracking_id):
 
     user_agent = request.META.get("HTTP_USER_AGENT", "")
-    ip = request.META.get("REMOTE_ADDR")
+    ip = get_client_ip(request)
 
     print("EMAIL OPENED:", tracking_id)
     print("User-Agent:", user_agent)
@@ -53,7 +61,7 @@ def track_open(request, tracking_id):
 def track_click(request, tracking_id):
 
     user_agent = request.META.get("HTTP_USER_AGENT", "")
-    ip = request.META.get("REMOTE_ADDR")
+    ip = get_client_ip(request)
 
     redirect_url = request.GET.get("url", "https://google.com")
 
@@ -134,7 +142,7 @@ def send_tracking_email(to_email, tracking_id):
 <p>Hello,</p>
 <p>Check this out:</p>
 
-<a href="{BASE_URL}/track/click/{tracking_id}?url=https://sendermailing.pythonanywhere.com" target="_blank">
+<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com" target="_blank">
     Open Link
 </a>
 
