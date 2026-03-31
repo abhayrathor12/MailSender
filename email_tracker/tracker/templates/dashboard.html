@@ -1,67 +1,283 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background: #f4f4f4; }
-        .yes { color: green; font-weight: bold; }
-        .no { color: red; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f4ff;
+            --surface: #ffffff;
+            --surface2: #f5f7ff;
+            --border: #dde2f0;
+            --text-primary: #0f1523;
+            --text-secondary: #2d3650;
+            --text-muted: #64748b;
+            --green: #15803d;
+            --green-bg: #dcfce7;
+            --green-border: #bbf7d0;
+            --red: #b91c1c;
+            --red-bg: #fee2e2;
+            --red-border: #fecaca;
+            --accent: #203f78;
+            --accent-light: #eef2ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 48px 28px;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; }
+
+        /* ── Header ── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .header-left h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .header-left h1 span { color: var(--accent); }
+
+        .header-left p {
+            margin-top: 6px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .live-dot {
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
+            50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
+        }
+
+        /* ── Table card ── */
+        .table-wrap {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(79,70,229,0.06), 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+
+        /* ── Head ── */
+        thead {
+            background: var(--accent-light);
+            border-bottom: 1.5px solid #c7d2fe;
+        }
+
+        th {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            padding: 14px 20px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        /* ── Body rows ── */
+        td {
+            font-size: 14px;
+            font-weight: 500;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        tbody tr { transition: background 0.12s; }
+        tbody tr:hover { background: var(--surface2); }
+
+        /* Email */
+        td.email-cell {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 13.5px;
+        }
+
+        /* Pills */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+            letter-spacing: 0.1px;
+        }
+
+        .pill-yes {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1.5px solid var(--green-border);
+        }
+
+        .pill-no {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1.5px solid var(--red-border);
+        }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .dot-yes { background: var(--green); }
+        .dot-no  { background: var(--red); }
+
+        /* Meta */
+        td.meta {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        td.ua {
+            font-size: 13px;
+            font-weight: 500;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-muted);
+        }
+
+        td.open-type {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 24px 14px; }
+            header { flex-direction: column; align-items: flex-start; }
+            .header-left h1 { font-size: 26px; }
+        }
     </style>
 </head>
 <body>
 
-<h2>Email Tracking Dashboard</h2>
-<table>
-    <tr>
-        <th>Email</th>
-        <th>Delivered</th>
-        <th>Opened</th>
-        <th>Clicked</th>
-        <th>Delivered At</th>
-        <th>Opened At</th>
-        <th>Clicked At</th>
-        <th>User Agent</th>
-        <th>IP Address</th>
-        <th>Open Type</th>
-    </tr>
+<div class="container">
 
-    {% for item in data %}
-    <tr>
-        <td>{{ item.email }}</td>
-        <td>
-{% if item.delivered %}
-<span class="yes">✔ Delivered</span>
-{% else %}
-<span class="no">✘ Not Delivered</span>
-{% endif %}
-</td>
-        <td>
-            {% if item.opened %}
-                <span class="yes">✔ Opened</span>
-            {% else %}
-                <span class="no">✘ Not Opened</span>
-            {% endif %}
-        </td>
+    <header>
+        <div class="header-left">
+            <h1>Email <span>Tracker</span></h1>
+            <p>Delivery · Open · Click analytics</p>
+        </div>
+        <div class="live-badge">
+            <span class="live-dot"></span>
+            Live Dashboard
+        </div>
+    </header>
 
-        <td>
-            {% if item.clicked %}
-                <span class="yes">✔ Clicked</span>
-            {% else %}
-                <span class="no">✘ Not Clicked</span>
-            {% endif %}
-        </td>
-    <td>{{ item.delivered_at }}</td>
-        <td>{{ item.opened_at }}</td>
-        <td>{{ item.clicked_at }}</td>
-        <td>{{ item.user_agent }}</td>
-        <td>{{ item.ip_address }}</td>
-        <td>{{ item.open_type }}</td>
-    </tr>
-    {% endfor %}
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Delivered</th>
+                        <th>Opened</th>
+                        <th>Clicked</th>
+                        <th>Delivered At</th>
+                        <th>Opened At</th>
+                        <th>Clicked At</th>
+                        <th>User Agent</th>
+                        <th>IP Address</th>
+                        <th>Open Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td class="email-cell">{{ item.email }}</td>
 
-</table>
+                        <td>
+                            {% if item.delivered %}
+                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Delivered</span>
+                            {% else %}
+                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Delivered</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.opened %}
+                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Opened</span>
+                            {% else %}
+                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Opened</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.clicked %}
+                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Clicked</span>
+                            {% else %}
+                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Clicked</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="meta">{{ item.delivered_at }}</td>
+                        <td class="meta">{{ item.opened_at }}</td>
+                        <td class="meta">{{ item.clicked_at }}</td>
+                        <td class="ua" title="{{ item.user_agent }}">{{ item.user_agent }}</td>
+                        <td class="meta">{{ item.ip_address }}</td>
+                        <td class="open-type">{{ item.open_type }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
 </body>
 </html>
