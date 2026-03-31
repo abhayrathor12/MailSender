@@ -7,6 +7,9 @@ class EmailTrack(models.Model):
 
     sent_at = models.DateTimeField(auto_now_add=True)
 
+    delivered = models.BooleanField(default=False)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+
     opened = models.BooleanField(default=False)
     opened_at = models.DateTimeField(null=True, blank=True)
 

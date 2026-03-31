@@ -6,7 +6,27 @@ import base64
 
 
 
+def get_email_status(user_agent, ip):
 
+    ua = (user_agent or "").lower()
+
+    # Gmail security scan (treat as delivered)
+    if (
+        "chrome/42" in ua
+        and "edge/12" in ua
+        and ip.startswith("209.85.")
+    ):
+        return "delivered"
+
+    # Gmail proxy when user opens email
+    if "googleimageproxy" in ua or "ggpht.com" in ua:
+        return "opened"
+
+    if ip.startswith("74.125."):
+        return "opened"
+
+    # fallback
+    return "opened"
 
 def get_pixel():
     pixel = base64.b64decode(
@@ -22,30 +42,31 @@ def get_client_ip(request):
         ip = request.META.get("REMOTE_ADDR")
     return ip
 
-
 def track_open(request, tracking_id):
 
     user_agent = request.META.get("HTTP_USER_AGENT", "")
     ip = get_client_ip(request)
 
-    print("EMAIL OPENED:", tracking_id)
-    print("User-Agent:", user_agent)
-    print("IP:", ip)
+    status = get_email_status(user_agent, ip)
 
     try:
         obj = EmailTrack.objects.get(tracking_id=tracking_id)
 
-        obj.opened = True
+        if status == "delivered":
 
-        if not obj.opened_at:
-            obj.opened_at = timezone.now()
+            obj.delivered = True
 
-        # Gmail proxy detection
-        if "GoogleImageProxy" in user_agent:
-            obj.open_type = "gmail_proxy"
-        else:
-            obj.open_type = "direct"
+            if not obj.delivered_at:
+                obj.delivered_at = timezone.now()
 
+        if status == "opened":
+
+            obj.opened = True
+
+            if not obj.opened_at:
+                obj.opened_at = timezone.now()
+
+        obj.open_type = status
         obj.ip_address = ip
         obj.user_agent = user_agent
 
@@ -55,6 +76,7 @@ def track_open(request, tracking_id):
         pass
 
     return HttpResponse(get_pixel(), content_type="image/gif")
+
 
 
 # 🔸 Track Link Click

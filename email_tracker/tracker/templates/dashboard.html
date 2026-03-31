@@ -17,8 +17,10 @@
 <table>
     <tr>
         <th>Email</th>
+        <th>Delivered</th>
         <th>Opened</th>
         <th>Clicked</th>
+        <th>Delivered At</th>
         <th>Opened At</th>
         <th>Clicked At</th>
         <th>User Agent</th>
@@ -29,7 +31,13 @@
     {% for item in data %}
     <tr>
         <td>{{ item.email }}</td>
-
+        <td>
+{% if item.delivered %}
+<span class="yes">✔ Delivered</span>
+{% else %}
+<span class="no">✘ Not Delivered</span>
+{% endif %}
+</td>
         <td>
             {% if item.opened %}
                 <span class="yes">✔ Opened</span>
@@ -45,7 +53,7 @@
                 <span class="no">✘ Not Clicked</span>
             {% endif %}
         </td>
-
+    <td>{{ item.delivered_at }}</td>
         <td>{{ item.opened_at }}</td>
         <td>{{ item.clicked_at }}</td>
         <td>{{ item.user_agent }}</td>
