@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-i@w4-6u9&6p9y3$h^xc)9x7^b74qj4dsorwpf5f_qub_d+20@n
 DEBUG = True
 
 # ALLOWED_HOSTS = ["34b6-122-180-247-129.ngrok-free.app","localhost","127.0.0.1"]
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*","sendermailing.pythonanywhere.com","192.168.1.60"]
 
 # Application definition
 
@@ -126,5 +126,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+# EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = 'workspace00018@gmail.com'
+EMAIL_HOST_PASSWORD = 'gobd owgw ihks kqxe'
