@@ -14,13 +14,16 @@
 <body>
 
 <h2>Email Tracking Dashboard</h2>
-
 <table>
     <tr>
         <th>Email</th>
         <th>Opened</th>
         <th>Clicked</th>
-        <th>Sent Time</th>
+        <th>Opened At</th>
+        <th>Clicked At</th>
+        <th>User Agent</th>
+        <th>IP Address</th>
+        <th>Open Type</th>
     </tr>
 
     {% for item in data %}
@@ -52,6 +55,5 @@
     {% endfor %}
 
 </table>
-
 </body>
 </html>
