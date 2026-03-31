@@ -51,19 +51,39 @@ def track_open(request, tracking_id):
 
 # 🔸 Track Link Click
 def track_click(request, tracking_id):
+
+    user_agent = request.META.get("HTTP_USER_AGENT", "")
+    ip = request.META.get("REMOTE_ADDR")
+
+    redirect_url = request.GET.get("url", "https://google.com")
+
+    print("LINK CLICKED:", tracking_id)
+    print("User-Agent:", user_agent)
+    print("IP:", ip)
+
     try:
         obj = EmailTrack.objects.get(tracking_id=tracking_id)
 
-        if not obj.clicked:
-            obj.clicked = True
+        obj.clicked = True
+
+        if not obj.clicked_at:
             obj.clicked_at = timezone.now()
-            obj.save()
+
+        # detect gmail proxy
+        if "GoogleImageProxy" in user_agent:
+            obj.open_type = "gmail_proxy"
+        else:
+            obj.open_type = "direct"
+
+        obj.ip_address = ip
+        obj.user_agent = user_agent
+
+        obj.save()
 
     except EmailTrack.DoesNotExist:
         pass
 
-    # Redirect to actual link
-    return redirect("https://google.com")
+    return redirect(redirect_url)
 
 
 import uuid
@@ -114,7 +134,7 @@ def send_tracking_email(to_email, tracking_id):
 <p>Hello,</p>
 <p>Check this out:</p>
 
-<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com">
+<a href="{BASE_URL}/track/click/{tracking_id}?url=https://sendermailing.pythonanywhere.com" target="_blank">
     Open Link
 </a>
 
