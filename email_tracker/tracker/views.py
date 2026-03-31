@@ -60,39 +60,33 @@ def track_open(request, tracking_id):
 # 🔸 Track Link Click
 def track_click(request, tracking_id):
 
-    user_agent = request.META.get("HTTP_USER_AGENT", "")
+    user_agent = request.META.get("HTTP_USER_AGENT", "").lower()
     ip = get_client_ip(request)
 
-    redirect_url = request.GET.get("url", "https://google.com")
+    # detect bots / scanners
+    bot_keywords = ["google", "bot", "scanner", "curl", "python", "proofpoint"]
 
-    print("LINK CLICKED:", tracking_id)
-    print("User-Agent:", user_agent)
-    print("IP:", ip)
+    if any(word in user_agent for word in bot_keywords):
+        print("Scanner detected, ignoring click")
+        return redirect(request.GET.get("url", "https://google.com"))
+
+    redirect_url = request.GET.get("url", "https://google.com")
 
     try:
         obj = EmailTrack.objects.get(tracking_id=tracking_id)
 
         obj.clicked = True
-
         if not obj.clicked_at:
             obj.clicked_at = timezone.now()
 
-        # detect gmail proxy
-        if "GoogleImageProxy" in user_agent:
-            obj.open_type = "gmail_proxy"
-        else:
-            obj.open_type = "direct"
-
         obj.ip_address = ip
         obj.user_agent = user_agent
-
         obj.save()
 
     except EmailTrack.DoesNotExist:
         pass
 
     return redirect(redirect_url)
-
 
 import uuid
 
