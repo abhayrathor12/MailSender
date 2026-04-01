@@ -276,15 +276,20 @@
                             </div>
                         </td>
                         <td>
-                            <a href="/schedule/send/{{ group.id }}/" class="send-email-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="22" y1="2" x2="11" y2="13"/>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                                </svg>
-                                Send Emails
-                            </a>
-                        </td>
+    <button
+        class="send-email-btn"
+        data-group-id="{{ group.id }}"
+        data-group-name="{{ group.name }}"
+        onclick="handleSend(this)"
+    >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Send Emails
+    </button>
+</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -306,5 +311,73 @@
             {% endif %}
         </div>
     </div>
+{% block extra_scripts %}
+<script>
+    let globalSending = false;   /* client-side guard */
 
+    async function handleSend(btn) {
+        if (globalSending) {
+            showPopup('busy', 'Please wait — another group is already sending emails.');
+            return;
+        }
+
+        const groupId   = btn.dataset.groupId;
+        const groupName = btn.dataset.groupName;
+
+        /* Disable ALL send buttons and mark this one as "Sending…" */
+        globalSending = true;
+        document.querySelectorAll('.send-email-btn').forEach(b => {
+            b.disabled = true;
+            b.style.opacity = '0.5';
+            b.style.cursor  = 'not-allowed';
+        });
+
+        btn.style.opacity = '1';
+        btn.style.cursor  = 'default';
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            Sending…
+        `;
+
+        try {
+            const resp = await fetch(`/schedule/send/${groupId}/`);
+            const data = await resp.json();
+
+            if (resp.ok && data.status === 'started') {
+                showPopup('success', data.message);
+            } else if (resp.status === 409) {
+                showPopup('busy', data.message);
+            } else {
+                showPopup('error', data.message || 'An unexpected error occurred.');
+            }
+        } catch (err) {
+            showPopup('error', 'Network error. Please try again.');
+        } finally {
+            /* Re-enable all buttons and restore original label */
+            globalSending = false;
+            document.querySelectorAll('.send-email-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = '';
+                b.style.cursor  = '';
+            });
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                Send Emails
+            `;
+        }
+    }
+</script>
+
+<style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .send-email-btn:disabled { transform: none !important; box-shadow: none !important; }
+</style>
+{% endblock %}
 {% endblock %}

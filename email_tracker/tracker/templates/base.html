@@ -99,8 +99,6 @@
             letter-spacing: 0.2px;
         }
 
-
-
         /* ── SIDEBAR ── */
         .sidebar {
             position: fixed;
@@ -187,11 +185,6 @@
             border-top: 1.5px solid var(--border);
         }
 
-        .sidebar-footer .nav-link {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
         /* ── MAIN CONTENT ── */
         .main-content {
             margin-left: var(--sidebar-w);
@@ -218,20 +211,13 @@
 
         @media (max-width: 768px) {
             .mobile-menu-btn { display: flex; }
-
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
                 box-shadow: 4px 0 24px rgba(0,0,0,0.1);
             }
-
             .sidebar.open { transform: translateX(0); }
-
-            .main-content {
-                margin-left: 0;
-                padding: 24px 16px;
-            }
-
+            .main-content { margin-left: 0; padding: 24px 16px; }
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -239,9 +225,98 @@
                 background: rgba(0,0,0,0.3);
                 z-index: 89;
             }
-
             .sidebar-overlay.open { display: block; }
         }
+
+        /* ── GLOBAL POPUP ── */
+        .gp-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,21,35,0.45);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            animation: gp-fade-in 0.18s ease;
+        }
+
+        .gp-backdrop.visible { display: flex; }
+
+        @keyframes gp-fade-in {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .gp-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 28px 24px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 16px;
+            box-shadow: 0 20px 60px rgba(15,21,35,0.18);
+            animation: gp-slide-in 0.22s cubic-bezier(0.34,1.56,0.64,1);
+            text-align: center;
+        }
+
+        @keyframes gp-slide-in {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .gp-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            flex-shrink: 0;
+        }
+
+        .gp-icon svg { width: 24px; height: 24px; }
+
+        .gp-icon.success { background: var(--green-bg); color: var(--green); }
+        .gp-icon.error   { background: var(--red-bg);   color: var(--red); }
+        .gp-icon.busy    { background: #fef3c7;          color: #92400e; }
+
+        .gp-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .gp-message {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+
+        .gp-close-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 28px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(32,63,120,0.22);
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .gp-close-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .gp-close-btn:active { transform: translateY(0); }
 
         {% block extra_styles %}{% endblock %}
     </style>
@@ -314,7 +389,7 @@
         </a>
 
         <div class="sidebar-footer">
-            <a href="{% url 'send' %}" class="nav-link">
+            <a href="{% url 'send' %}" class="nav-link {% block nav_send %}{% endblock %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"/>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -324,15 +399,28 @@
         </div>
     </aside>
 
+    <!-- ── GLOBAL POPUP ── -->
+    <div class="gp-backdrop" id="gpBackdrop" role="dialog" aria-modal="true" aria-labelledby="gpTitle">
+        <div class="gp-card">
+            <div class="gp-icon" id="gpIcon">
+                <!-- icon injected by JS -->
+            </div>
+            <div class="gp-title" id="gpTitle">Title</div>
+            <div class="gp-message" id="gpMessage">Message</div>
+            <button class="gp-close-btn" id="gpCloseBtn">Got it</button>
+        </div>
+    </div>
+
     <!-- ── PAGE CONTENT ── -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <script>
+        /* ── Sidebar toggle ── */
         const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
+        const sidebar    = document.getElementById('sidebar');
+        const overlay    = document.getElementById('sidebarOverlay');
 
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
@@ -343,6 +431,54 @@
             sidebar.classList.remove('open');
             overlay.classList.remove('open');
         });
+
+        /* ── Global Popup ── */
+        const gpBackdrop = document.getElementById('gpBackdrop');
+        const gpIcon     = document.getElementById('gpIcon');
+        const gpTitle    = document.getElementById('gpTitle');
+        const gpMessage  = document.getElementById('gpMessage');
+        const gpCloseBtn = document.getElementById('gpCloseBtn');
+
+        const GP_ICONS = {
+            success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+            error:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+            busy:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+        };
+
+        const GP_TITLES = {
+            success: 'Emails Sent!',
+            error:   'Something Went Wrong',
+            busy:    'Already Sending',
+        };
+
+        /**
+         * Show the global popup.
+         * @param {'success'|'error'|'busy'} type
+         * @param {string} message
+         */
+        function showPopup(type, message) {
+            gpIcon.className    = 'gp-icon ' + type;
+            gpIcon.innerHTML    = GP_ICONS[type] || GP_ICONS.error;
+            gpTitle.textContent = GP_TITLES[type] || 'Notice';
+            gpMessage.textContent = message;
+            gpBackdrop.classList.add('visible');
+        }
+
+        function closePopup() {
+            gpBackdrop.classList.remove('visible');
+        }
+
+        gpCloseBtn.addEventListener('click', closePopup);
+        gpBackdrop.addEventListener('click', (e) => {
+            if (e.target === gpBackdrop) closePopup();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePopup();
+        });
+
+        /* expose globally so schedule.html (and any page) can call it */
+        window.showPopup  = showPopup;
+        window.closePopup = closePopup;
     </script>
 
     {% block extra_scripts %}{% endblock %}
