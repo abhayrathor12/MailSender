@@ -1,229 +1,168 @@
+{% extends 'base.html' %}
 
+{% block title %}Send Mail — Email Tracker{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Tracking Email</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% block nav_send %}active{% endblock %}
 
-        :root {
-            --bg: #f0f4ff;
-            --surface: #ffffff;
-            --border: #dde2f0;
-            --text-primary: #0f1523;
-            --text-secondary: #2d3650;
-            --text-muted: #64748b;
-            --accent: #203f78;
-            --accent-light: #eef2ff;
-            --accent-hover: #203f78cc;
-            --input-border: #c7d2fe;
-        }
+{% block extra_styles %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 48px 28px;
-        }
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
 
-        .container { max-width: 1280px; margin: 0 auto; }
+    .page-title {
+        font-family: 'Inter', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        color: var(--text-primary);
+    }
 
-        /* ── Header ── */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 48px;
-        }
+    .page-title span { color: var(--accent); }
 
-        .header-left h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.6px;
-            color: var(--text-primary);
-            line-height: 1;
-        }
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
 
-        .header-left h1 span { color: var(--accent); }
+    .card {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+        max-width: 520px;
+        padding: 40px 40px 36px;
+    }
 
-        .header-left p {
-            margin-top: 6px;
-            font-size: 13.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
+    .card-icon {
+        width: 52px; height: 52px;
+        background: var(--accent-light);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
 
-        .dashboard-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff;
-            color: var(--text-secondary);
-            border: 1.5px solid var(--border);
-            border-radius: 999px;
-            padding: 9px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            transition: border-color 0.15s, color 0.15s, transform 0.1s;
-        }
+    .card-icon svg { width: 24px; height: 24px; color: var(--accent); }
 
-        .dashboard-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateY(-1px);
-        }
+    .card h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+        margin-bottom: 6px;
+    }
 
-        .dashboard-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .card p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-bottom: 28px;
+        line-height: 1.5;
+    }
 
-        /* ── Card ── */
-        .card {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(79,70,229,0.06), 0 1px 4px rgba(0,0,0,0.04);
-            max-width: 520px;
-            padding: 40px 40px 36px;
-        }
+    label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
 
-        .card-icon {
-            width: 52px; height: 52px;
-            background: var(--accent-light);
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px;
-        }
+    input[type="email"] {
+        width: 100%;
+        padding: 13px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+        color: var(--text-primary);
+        background: var(--accent-light);
+        border: 1.5px solid #c7d2fe;
+        border-radius: 12px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        margin-bottom: 20px;
+    }
 
-        .card-icon svg { width: 24px; height: 24px; color: var(--accent); }
+    input[type="email"]::placeholder { color: var(--text-muted); font-weight: 400; }
 
-        .card h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-            margin-bottom: 6px;
-        }
+    input[type="email"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(32,63,120,0.12);
+        background: #fff;
+    }
 
-        .card p {
-            font-size: 13.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 28px;
-            line-height: 1.5;
-        }
+    .submit-btn {
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(32,63,120,0.28);
+        transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        letter-spacing: 0.1px;
+    }
 
-        /* ── Form ── */
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.9px;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
+    .submit-btn:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 4px 16px rgba(32,63,120,0.38);
+        transform: translateY(-1px);
+    }
 
-        input[type="email"] {
-            width: 100%;
-            padding: 13px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            color: var(--text-primary);
-            background: var(--accent-light);
-            border: 1.5px solid var(--input-border);
-            border-radius: 12px;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-            margin-bottom: 20px;
-        }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+    .submit-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-        input[type="email"]::placeholder { color: var(--text-muted); font-weight: 400; }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
 
-        input[type="email"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
-            background: #fff;
-        }
+{% endblock %}
 
-        .submit-btn {
-            width: 100%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 20px;
-            font-size: 14px;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(79,70,229,0.28);
-            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-            letter-spacing: 0.1px;
-        }
+{% block content %}
 
-        .submit-btn:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 4px 16px rgba(79,70,229,0.38);
-            transform: translateY(-1px);
-        }
-
-        .submit-btn:active { transform: translateY(0); }
-
-        .submit-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-        @media (max-width: 600px) {
-            body { padding: 24px 14px; }
-            header { flex-direction: column; align-items: flex-start; }
-            .header-left h1 { font-size: 26px; }
-            .card { padding: 28px 22px 24px; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-
-    <header>
-        <div class="header-left">
-            <h1>Email <span>Tracker</span></h1>
-            <p>Delivery · Open · Click analytics</p>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title">Send <span>Mail</span></div>
+            <div class="page-subtitle">Send a tracked email to any address</div>
         </div>
-        <a href="/" class="dashboard-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-            </svg>
-            Dashboard
-        </a>
-    </header>
+    </div>
 
+    <!-- Card -->
     <div class="card">
         <div class="card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
         </div>
         <h2>Send Tracking Email</h2>
-        <p>Enter a Gmail address to send a tracked email. You'll see delivery, open, and click stats on the dashboard.</p>
+        <p>Enter a recipient address to send a tracked email. You'll see delivery, open, and click stats on the dashboard.</p>
 
-        <form method="POST">
+        <form id="sendForm">
             {% csrf_token %}
             <label for="email">Recipient Email</label>
             <input
@@ -233,16 +172,74 @@
                 placeholder="example@gmail.com"
                 required
             >
-            <button type="submit" class="submit-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
                 Send Tracking Email
             </button>
         </form>
     </div>
 
-</div>
+{% endblock %}
 
-</body>
-</html>
+{% block extra_scripts %}
+<script>
+    const sendForm  = document.getElementById('sendForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const ICON_SEND = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Send Tracking Email
+    `;
+
+    const ICON_SENDING = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             style="width:16px;height:16px;flex-shrink:0;animation:spin 1s linear infinite;">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Sending…
+    `;
+
+    sendForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        if (!email) return;
+
+        /* Show sending state */
+        submitBtn.disabled   = true;
+        submitBtn.innerHTML  = ICON_SENDING;
+
+        const formData = new FormData(sendForm);
+
+        try {
+            const resp = await fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+            });
+
+            if (resp.ok) {
+                showPopup('success', `Tracking email sent to ${email} successfully.`);
+                sendForm.reset();
+            } else {
+                showPopup('error', 'Failed to send email. Please try again.');
+            }
+
+        } catch (err) {
+            showPopup('error', 'Network error. Please check your connection.');
+        } finally {
+            submitBtn.disabled  = false;
+            submitBtn.innerHTML = ICON_SEND;
+        }
+    });
+</script>
+{% endblock %}

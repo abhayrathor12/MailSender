@@ -5,42 +5,41 @@
 {% block nav_dashboard %}active{% endblock %}
 
 {% block extra_styles %}
-    /* ── Stats row ── */
     .stats-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
     }
 
     .stat-card {
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 14px;
-        padding: 20px 22px;
+        border-radius: 10px;
+        padding: 12px 14px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        box-shadow: 0 2px 8px rgba(32,63,120,0.05);
+        gap: 2px;
+        box-shadow: 0 1px 4px rgba(32,63,120,0.04);
         transition: box-shadow 0.15s, transform 0.15s;
     }
 
     .stat-card:hover {
-        box-shadow: 0 6px 20px rgba(32,63,120,0.1);
-        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(32,63,120,0.08);
+        transform: translateY(-1px);
     }
 
     .stat-label {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         color: var(--text-muted);
     }
 
     .stat-value {
-        font-family: 'Syne', sans-serif;
-        font-size: 28px;
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
         font-weight: 800;
         color: var(--text-primary);
         letter-spacing: -0.5px;
@@ -48,52 +47,51 @@
     }
 
     .stat-sub {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
         color: var(--text-muted);
     }
 
     .stat-icon {
-        width: 36px; height: 36px;
-        border-radius: 10px;
+        width: 26px; height: 26px;
+        border-radius: 7px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 4px;
     }
 
-    .stat-icon svg { width: 17px; height: 17px; }
+    .stat-icon svg { width: 13px; height: 13px; }
 
-    .stat-icon.blue  { background: #dbeafe; color: #1d4ed8; }
-    .stat-icon.green { background: var(--green-bg); color: var(--green); }
-    .stat-icon.purple{ background: #ede9fe; color: #7c3aed; }
-    .stat-icon.orange{ background: #fff7ed; color: #c2410c; }
+    .stat-icon.blue   { background: #dbeafe; color: #1d4ed8; }
+    .stat-icon.green  { background: var(--green-bg); color: var(--green); }
+    .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+    .stat-icon.orange { background: #fff7ed; color: #c2410c; }
 
-    /* ── Page header ── */
     .page-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 14px;
-        margin-bottom: 24px;
+        gap: 10px;
+        margin-bottom: 16px;
     }
 
     .page-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 22px;
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
         font-weight: 800;
-        letter-spacing: -0.4px;
+        letter-spacing: -0.3px;
         color: var(--text-primary);
     }
 
     .page-title span { color: var(--accent); }
 
     .page-subtitle {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-muted);
         font-weight: 500;
-        margin-top: 3px;
+        margin-top: 2px;
     }
 
     .send-btn {
@@ -104,10 +102,10 @@
         color: #fff;
         border: none;
         border-radius: 999px;
-        padding: 9px 18px;
+        padding: 8px 16px;
         font-size: 13px;
         font-weight: 600;
-        font-family: 'DM Sans', sans-serif;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(32,63,120,0.28);
         transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
@@ -121,7 +119,7 @@
     }
 
     .send-btn:active { transform: translateY(0); }
-    .send-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .send-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
     .live-badge {
         display: flex;
@@ -130,15 +128,15 @@
         background: #fff;
         border: 1.5px solid var(--border);
         border-radius: 999px;
-        padding: 8px 16px;
-        font-size: 12.5px;
+        padding: 7px 14px;
+        font-size: 12px;
         font-weight: 600;
         color: var(--text-secondary);
         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     .live-dot {
-        width: 8px; height: 8px;
+        width: 7px; height: 7px;
         background: #22c55e;
         border-radius: 50%;
         box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
@@ -150,28 +148,27 @@
         50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
     }
 
-    /* ── Table card ── */
     .table-wrap {
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 16px;
+        border-radius: 14px;
         overflow: hidden;
-        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 12px rgba(32,63,120,0.05), 0 1px 4px rgba(0,0,0,0.03);
     }
 
     .table-toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 20px;
+        padding: 12px 16px;
         border-bottom: 1.5px solid var(--border);
         background: var(--surface);
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
 
     .table-title {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
         color: var(--text-primary);
     }
@@ -198,15 +195,15 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         color: var(--accent);
-        padding: 13px 20px;
+        padding: 10px 16px;
         text-align: left;
         white-space: nowrap;
     }
 
     td {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
-        padding: 13px 20px;
+        padding: 10px 16px;
         border-bottom: 1px solid var(--border);
         color: var(--text-secondary);
         vertical-align: middle;
@@ -219,16 +216,16 @@
     td.email-cell {
         font-weight: 700;
         color: var(--text-primary);
-        font-size: 13.5px;
+        font-size: 13px;
     }
 
     .pill {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        font-size: 12px;
+        gap: 5px;
+        font-size: 11.5px;
         font-weight: 700;
-        padding: 5px 12px;
+        padding: 4px 10px;
         border-radius: 999px;
         white-space: nowrap;
         letter-spacing: 0.1px;
@@ -246,21 +243,21 @@
         border: 1.5px solid var(--red-border);
     }
 
-    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .dot-yes { background: var(--green); }
     .dot-no  { background: var(--red); }
 
     td.meta {
-        font-family: 'SF Mono', 'Fira Code', monospace;
-        font-size: 12.5px;
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
         font-weight: 500;
         color: var(--text-muted);
     }
 
     td.ua {
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 500;
-        max-width: 170px;
+        max-width: 160px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -268,20 +265,109 @@
     }
 
     td.open-type {
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 700;
         color: var(--accent);
+    }
+
+    /* ── Pagination ── */
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        border-top: 1.5px solid var(--border);
+        background: var(--surface);
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pag-info {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .pag-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pag-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        background: var(--surface);
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: background 0.12s, border-color 0.12s;
+    }
+
+    .pag-btn:hover:not(:disabled) {
+        background: var(--surface2);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .pag-btn:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+
+    .pag-pages {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .pag-page {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        border: 1.5px solid transparent;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        color: var(--text-secondary);
+        background: none;
+        transition: all 0.12s;
+    }
+
+    .pag-page:hover { background: var(--surface2); }
+
+    .pag-page.active {
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .pag-sep {
+        font-size: 12px;
+        color: var(--text-muted);
+        padding: 0 2px;
+        user-select: none;
     }
 
     @media (max-width: 600px) {
         .page-header { flex-direction: column; align-items: flex-start; }
         .stats-row { grid-template-columns: 1fr 1fr; }
+        .pagination { flex-direction: column; align-items: flex-start; }
     }
 {% endblock %}
 
 {% block content %}
 
-    <!-- Page Header -->
     <div class="page-header">
         <div>
             <div class="page-title"><span>Dashboard</span></div>
@@ -289,58 +375,11 @@
         </div>
     </div>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="4" width="20" height="16" rx="3"/><polyline points="2,4 12,14 22,4"/>
-                </svg>
-            </div>
-            <div class="stat-label">Total Sent</div>
-            <div class="stat-value">{{ data|length }}</div>
-            <div class="stat-sub">emails tracked</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                </svg>
-            </div>
-            <div class="stat-label">Delivered</div>
-            <div class="stat-value">{{ data|length }}</div>
-            <div class="stat-sub">successful deliveries</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-            </div>
-            <div class="stat-label">Opened</div>
-            <div class="stat-value">—</div>
-            <div class="stat-sub">unique opens</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                </svg>
-            </div>
-            <div class="stat-label">Clicked</div>
-            <div class="stat-value">—</div>
-            <div class="stat-sub">link clicks</div>
-        </div>
-    </div>
-
-    <!-- Table -->
     <div class="table-wrap">
         <div class="table-toolbar">
             <div>
                 <div class="table-title">Tracking Log</div>
-                <div class="table-count">{{ data|length }} record{{ data|length|pluralize }}</div>
+                <div class="table-count" id="record-count"></div>
             </div>
         </div>
         <div class="table-scroll">
@@ -359,7 +398,7 @@
                         <th>Open Type</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="table-body">
                     {% for item in data %}
                     <tr>
                         <td class="email-cell">{{ item.email }}</td>
@@ -399,6 +438,80 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination" id="pagination"></div>
     </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const PER_PAGE = 5;
+    const tbody = document.getElementById('table-body');
+    const paginationEl = document.getElementById('pagination');
+    const countEl = document.getElementById('record-count');
+
+    const allRows = Array.from(tbody.querySelectorAll('tr'));
+    const total = allRows.length;
+    const totalPages = Math.ceil(total / PER_PAGE);
+    let currentPage = 1;
+
+    function render(page) {
+        currentPage = page;
+        const start = (page - 1) * PER_PAGE;
+        const end = Math.min(start + PER_PAGE, total);
+
+        allRows.forEach((row, i) => {
+            row.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+
+        const s = start + 1;
+        countEl.textContent = total === 0
+            ? '0 records'
+            : `Showing ${s}–${end} of ${total} record${total !== 1 ? 's' : ''}`;
+
+        renderPagination();
+    }
+
+    function renderPagination() {
+        if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
+
+        const pages = getPageNumbers(currentPage, totalPages);
+
+        let html = `<span class="pag-info">Page ${currentPage} of ${totalPages}</span>`;
+        html += `<div class="pag-controls">`;
+        html += `<button class="pag-btn" id="pag-prev" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+        html += `<div class="pag-pages">`;
+
+        pages.forEach(p => {
+            if (p === '…') {
+                html += `<span class="pag-sep">…</span>`;
+            } else {
+                html += `<button class="pag-page${p === currentPage ? ' active' : ''}" data-page="${p}">${p}</button>`;
+            }
+        });
+
+        html += `</div>`;
+        html += `<button class="pag-btn" id="pag-next" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+        html += `</div>`;
+
+        paginationEl.innerHTML = html;
+
+        document.getElementById('pag-prev').addEventListener('click', () => render(currentPage - 1));
+        document.getElementById('pag-next').addEventListener('click', () => render(currentPage + 1));
+        paginationEl.querySelectorAll('.pag-page').forEach(btn => {
+            btn.addEventListener('click', () => render(parseInt(btn.dataset.page)));
+        });
+    }
+
+    function getPageNumbers(current, total) {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+        if (current <= 4) return [1, 2, 3, 4, 5, '…', total];
+        if (current >= total - 3) return [1, '…', total-4, total-3, total-2, total-1, total];
+        return [1, '…', current - 1, current, current + 1, '…', total];
+    }
+
+    render(1);
+})();
+</script>
 {% endblock %}

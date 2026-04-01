@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Email Tracker{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +31,7 @@
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text-primary);
             min-height: 100vh;
@@ -83,7 +84,7 @@
         }
 
         .brand-name {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 16px;
             font-weight: 800;
             color: var(--text-primary);
@@ -188,7 +189,7 @@
         /* ── MAIN CONTENT ── */
         .main-content {
             margin-left: var(--sidebar-w);
-            margin-top: var(--navbar-h);
+            margin-top: 40px;
             padding: 36px 32px;
             min-height: calc(100vh - var(--navbar-h));
             flex: 1;
@@ -282,7 +283,7 @@
         .gp-icon.busy    { background: #fef3c7;          color: #92400e; }
 
         .gp-title {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 17px;
             font-weight: 800;
             color: var(--text-primary);
@@ -309,7 +310,7 @@
             padding: 10px 28px;
             font-size: 13.5px;
             font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(32,63,120,0.22);
             transition: background 0.15s, transform 0.1s;
@@ -349,7 +350,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <aside class="sidebar" id="sidebar">
-        <span class="sidebar-section-label">Main</span>
+        
 
         <a href="{% url 'dashboard' %}" class="nav-link {% block nav_dashboard %}{% endblock %}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
