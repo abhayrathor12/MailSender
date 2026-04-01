@@ -103,9 +103,35 @@ def get_data(request):
     return JsonResponse(data, safe=False)
 
 
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import EmailTrack
+
+
 def dashboard(request):
-    data = EmailTrack.objects.all().order_by('-sent_at')
-    return render(request, 'dashboard.html', {'data': data})
+    return render(request, "dashboard.html")
+
+
+def dashboard_data(request):
+    emails = EmailTrack.objects.all().order_by("-sent_at")
+
+    data = []
+
+    for item in emails:
+        data.append({
+            "email": item.email,
+            "delivered": item.delivered,
+            "opened": item.opened,
+            "clicked": item.clicked,
+            "delivered_at": item.delivered_at,
+            "opened_at": item.opened_at,
+            "clicked_at": item.clicked_at,
+            "user_agent": item.user_agent,
+            "ip_address": item.ip_address,
+            "open_type": item.open_type,
+        })
+
+    return JsonResponse({"data": data})
 
 
 from django.core.mail import EmailMultiAlternatives

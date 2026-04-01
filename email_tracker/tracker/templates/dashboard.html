@@ -398,44 +398,7 @@
                         <th>Open Type</th>
                     </tr>
                 </thead>
-                <tbody id="table-body">
-                    {% for item in data %}
-                    <tr>
-                        <td class="email-cell">{{ item.email }}</td>
-
-                        <td>
-                            {% if item.delivered %}
-                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Delivered</span>
-                            {% else %}
-                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Delivered</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if item.opened %}
-                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Opened</span>
-                            {% else %}
-                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Opened</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if item.clicked %}
-                                <span class="pill pill-yes"><span class="dot dot-yes"></span>Clicked</span>
-                            {% else %}
-                                <span class="pill pill-no"><span class="dot dot-no"></span>Not Clicked</span>
-                            {% endif %}
-                        </td>
-
-                        <td class="meta">{{ item.delivered_at }}</td>
-                        <td class="meta">{{ item.opened_at }}</td>
-                        <td class="meta">{{ item.clicked_at }}</td>
-                        <td class="ua" title="{{ item.user_agent }}">{{ item.user_agent }}</td>
-                        <td class="meta">{{ item.ip_address }}</td>
-                        <td class="open-type">{{ item.open_type }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                <tbody id="table-body"></tbody>
             </table>
         </div>
         <div class="pagination" id="pagination"></div>
@@ -446,18 +409,20 @@
 {% block extra_scripts %}
 <script>
 (function () {
+
     const PER_PAGE = 5;
     const tbody = document.getElementById('table-body');
     const paginationEl = document.getElementById('pagination');
     const countEl = document.getElementById('record-count');
 
-    const allRows = Array.from(tbody.querySelectorAll('tr'));
-    const total = allRows.length;
-    const totalPages = Math.ceil(total / PER_PAGE);
+    let allRows = [];
+    let total = 0;
+    let totalPages = 0;
     let currentPage = 1;
 
     function render(page) {
         currentPage = page;
+
         const start = (page - 1) * PER_PAGE;
         const end = Math.min(start + PER_PAGE, total);
 
@@ -466,6 +431,7 @@
         });
 
         const s = start + 1;
+
         countEl.textContent = total === 0
             ? '0 records'
             : `Showing ${s}–${end} of ${total} record${total !== 1 ? 's' : ''}`;
@@ -474,7 +440,11 @@
     }
 
     function renderPagination() {
-        if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
+
+        if (totalPages <= 1) {
+            paginationEl.innerHTML = '';
+            return;
+        }
 
         const pages = getPageNumbers(currentPage, totalPages);
 
@@ -497,21 +467,87 @@
 
         paginationEl.innerHTML = html;
 
-        document.getElementById('pag-prev').addEventListener('click', () => render(currentPage - 1));
-        document.getElementById('pag-next').addEventListener('click', () => render(currentPage + 1));
+        document.getElementById('pag-prev').onclick = () => render(currentPage - 1);
+        document.getElementById('pag-next').onclick = () => render(currentPage + 1);
+
         paginationEl.querySelectorAll('.pag-page').forEach(btn => {
-            btn.addEventListener('click', () => render(parseInt(btn.dataset.page)));
+            btn.onclick = () => render(parseInt(btn.dataset.page));
         });
+
     }
 
     function getPageNumbers(current, total) {
+
         if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
         if (current <= 4) return [1, 2, 3, 4, 5, '…', total];
-        if (current >= total - 3) return [1, '…', total-4, total-3, total-2, total-1, total];
+
+        if (current >= total - 3)
+            return [1, '…', total - 4, total - 3, total - 2, total - 1, total];
+
         return [1, '…', current - 1, current, current + 1, '…', total];
+
     }
 
-    render(1);
+    function loadDashboard() {
+
+        fetch("/dashboard-data/")
+            .then(res => res.json())
+            .then(data => {
+
+                tbody.innerHTML = "";
+
+                data.data.forEach(item => {
+
+                    const row = `
+                    <tr>
+                        <td class="email-cell">${item.email}</td>
+
+                        <td>
+                            ${item.delivered
+                            ? `<span class="pill pill-yes"><span class="dot dot-yes"></span>Delivered</span>`
+                            : `<span class="pill pill-no"><span class="dot dot-no"></span>Not Delivered</span>`}
+                        </td>
+
+                        <td>
+                            ${item.opened
+                            ? `<span class="pill pill-yes"><span class="dot dot-yes"></span>Opened</span>`
+                            : `<span class="pill pill-no"><span class="dot dot-no"></span>Not Opened</span>`}
+                        </td>
+
+                        <td>
+                            ${item.clicked
+                            ? `<span class="pill pill-yes"><span class="dot dot-yes"></span>Clicked</span>`
+                            : `<span class="pill pill-no"><span class="dot dot-no"></span>Not Clicked</span>`}
+                        </td>
+
+                        <td class="meta">${item.delivered_at || ""}</td>
+                        <td class="meta">${item.opened_at || ""}</td>
+                        <td class="meta">${item.clicked_at || ""}</td>
+                        <td class="ua">${item.user_agent || ""}</td>
+                        <td class="meta">${item.ip_address || ""}</td>
+                        <td class="open-type">${item.open_type || ""}</td>
+                    </tr>
+                    `;
+
+                    tbody.insertAdjacentHTML("beforeend", row);
+
+                });
+
+                allRows = Array.from(tbody.querySelectorAll('tr'));
+                total = allRows.length;
+                totalPages = Math.ceil(total / PER_PAGE);
+
+                render(1);
+
+            });
+
+    }
+
+    loadDashboard();
+
+    setInterval(loadDashboard, 5000);
+
 })();
 </script>
 {% endblock %}
