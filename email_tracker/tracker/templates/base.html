@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Email Tracker{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f4ff;
+            --surface: #ffffff;
+            --surface2: #f5f7ff;
+            --border: #dde2f0;
+            --text-primary: #0f1523;
+            --text-secondary: #2d3650;
+            --text-muted: #64748b;
+            --accent: #203f78;
+            --accent-light: #eef2ff;
+            --accent-hover: #1a3366;
+            --sidebar-w: 240px;
+            --navbar-h: 64px;
+            --green: #15803d;
+            --green-bg: #dcfce7;
+            --green-border: #bbf7d0;
+            --red: #b91c1c;
+            --red-bg: #fee2e2;
+            --red-border: #fecaca;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--navbar-h);
+            background: var(--surface);
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 28px 0 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(32,63,120,0.07);
+        }
+
+        .navbar-brand {
+            width: var(--sidebar-w);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 24px;
+            flex-shrink: 0;
+            border-right: 1.5px solid var(--border);
+            height: 100%;
+        }
+
+        .brand-icon {
+            width: 34px; height: 34px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-icon svg { width: 17px; height: 17px; color: #fff; }
+
+        .navbar-center {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+            padding-left: 24px;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .brand-name span { color: var(--accent); }
+
+        .brand-sub {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-h);
+            left: 0;
+            width: var(--sidebar-w);
+            height: calc(100vh - var(--navbar-h));
+            background: var(--surface);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 90;
+            overflow-y: auto;
+        }
+
+        .sidebar-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 8px 12px 6px;
+            margin-top: 10px;
+        }
+
+        .sidebar-section-label:first-child { margin-top: 0; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: background 0.13s, color 0.13s;
+            position: relative;
+        }
+
+        .nav-link svg {
+            width: 17px; height: 17px;
+            flex-shrink: 0;
+            opacity: 0.7;
+            transition: opacity 0.13s;
+        }
+
+        .nav-link:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-link:hover svg { opacity: 1; }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(32,63,120,0.28);
+        }
+
+        .nav-link.active svg { opacity: 1; }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #e0e7ff;
+            color: var(--accent);
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+        }
+
+        .nav-link.active .nav-badge {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1.5px solid var(--border);
+        }
+
+        .sidebar-footer .nav-link {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--navbar-h);
+            padding: 36px 32px;
+            min-height: calc(100vh - var(--navbar-h));
+            flex: 1;
+        }
+
+        /* ── MOBILE TOGGLE ── */
+        .mobile-menu-btn {
+            display: none;
+            width: 34px; height: 34px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .mobile-menu-btn svg { width: 18px; height: 18px; color: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+                box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+            }
+
+            .sidebar.open { transform: translateX(0); }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px 16px;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.3);
+                z-index: 89;
+            }
+
+            .sidebar-overlay.open { display: block; }
+        }
+
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <button class="mobile-menu-btn" id="menuToggle" aria-label="Toggle sidebar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="3"/>
+                    <polyline points="2,4 12,14 22,4"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="navbar-center">
+            <span class="brand-name">Email <span>Tracker</span></span>
+            <span class="brand-sub">Delivery · Open · Click analytics</span>
+        </div>
+    </nav>
+
+    <!-- ── SIDEBAR ── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <span class="sidebar-section-label">Main</span>
+
+        <a href="{% url 'dashboard' %}" class="nav-link {% block nav_dashboard %}{% endblock %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Dashboard
+        </a>
+
+        <a href="{% url 'contacts' %}" class="nav-link {% block nav_contacts %}{% endblock %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Contacts
+        </a>
+
+        <a href="{% url 'groups' %}" class="nav-link {% block nav_groups %}{% endblock %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            Groups
+        </a>
+
+        <a href="{% url 'schedule' %}" class="nav-link {% block nav_schedule %}{% endblock %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Schedule
+        </a>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'send' %}" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                Send Mail
+            </a>
+        </div>
+    </aside>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

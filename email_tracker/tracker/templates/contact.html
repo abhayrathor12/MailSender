@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacts — Email Tracker{% endblock %}
+
+{% block nav_contacts %}active{% endblock %}
+
+{% block extra_styles %}
+
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        color: var(--text-primary);
+    }
+
+    .page-title span { color: var(--accent); }
+
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(32,63,120,0.28);
+        transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 4px 14px rgba(32,63,120,0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-secondary:hover {
+        background: var(--surface2);
+        border-color: #b0bbcc;
+    }
+
+    /* ── Table card ── */
+    .table-wrap {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1.5px solid var(--border);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .table-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .table-count {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 400px; }
+
+    thead {
+        background: var(--accent-light);
+        border-bottom: 1.5px solid #c7d2fe;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        padding: 13px 20px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    td {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td.name-cell {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 13.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .contact-avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        font-family: 'Syne', sans-serif;
+        flex-shrink: 0;
+    }
+
+    td.email-cell {
+        color: var(--text-muted);
+        font-size: 13.5px;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 56px 24px;
+    }
+
+    .empty-icon {
+        width: 52px; height: 52px;
+        background: var(--accent-light);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .empty-icon svg { width: 24px; height: 24px; color: var(--accent); }
+
+    .empty-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    .empty-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 21, 35, 0.45);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .modal-overlay.open {
+        display: flex;
+        animation: fadeIn 0.18s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .modal {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 24px 64px rgba(15,21,35,0.18), 0 4px 16px rgba(15,21,35,0.08);
+        animation: slideUp 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(24px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 0;
+    }
+
+    .modal-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .modal-icon {
+        width: 40px; height: 40px;
+        background: var(--accent-light);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-icon svg { width: 18px; height: 18px; color: var(--accent); }
+
+    .modal-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+    }
+
+    .modal-subtitle {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .modal-close {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: background 0.13s, color 0.13s;
+        flex-shrink: 0;
+    }
+
+    .modal-close:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+    .modal-close svg { width: 15px; height: 15px; }
+
+    .modal-body { padding: 20px 24px 24px; }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 7px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-primary);
+        background: var(--surface);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-input::placeholder { color: #aab4c8; }
+
+    .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(32,63,120,0.1);
+    }
+
+    .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1.5px solid var(--border);
+        background: var(--surface2);
+    }
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title"><span>Contacts</span></div>
+            <div class="page-subtitle">Manage your email contacts</div>
+        </div>
+        <button class="btn-primary" id="openModalBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Create Contact
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <div class="table-toolbar">
+            <div>
+                <div class="table-title">Contact List</div>
+                <div class="table-count">{{ contacts|length }} contact{{ contacts|length|pluralize }}</div>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            {% if contacts %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="contact-avatar">{{ contact.name|first|upper }}</div>
+                                <span style="font-weight:700; color:var(--text-primary);">{{ contact.name }}</span>
+                            </div>
+                        </td>
+                        <td class="email-cell">{{ contact.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="empty-title">No contacts yet</div>
+                <div class="empty-sub">Click "Create Contact" to add your first contact.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ── Modal ── -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="modal-title">New Contact</div>
+                        <div class="modal-subtitle">Fill in the details below</div>
+                    </div>
+                </div>
+                <button class="modal-close" id="closeModalBtn" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="contact-name">Name</label>
+                        <input class="form-input" type="text" id="contact-name"
+                               name="name" placeholder="e.g. Jane Smith" required autofocus>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label" for="contact-email">Email</label>
+                        <input class="form-input" type="email" id="contact-email"
+                               name="email" placeholder="e.g. jane@example.com" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" type="button" id="cancelModalBtn">Cancel</button>
+                    <button class="btn-primary" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Save Contact
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const modal        = document.getElementById('contactModal');
+    const openBtn      = document.getElementById('openModalBtn');
+    const closeBtn     = document.getElementById('closeModalBtn');
+    const cancelBtn    = document.getElementById('cancelModalBtn');
+
+    function openModal()  { modal.classList.add('open');    document.getElementById('contact-name').focus(); }
+    function closeModal() { modal.classList.remove('open'); }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+</script>
+{% endblock %}

@@ -1,0 +1,733 @@
+{% extends 'base.html' %}
+
+{% block title %}Groups — Email Tracker{% endblock %}
+
+{% block nav_groups %}active{% endblock %}
+
+{% block extra_styles %}
+
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        color: var(--text-primary);
+    }
+
+    .page-title span { color: var(--accent); }
+
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(32,63,120,0.28);
+        transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 4px 14px rgba(32,63,120,0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-secondary:hover {
+        background: var(--surface2);
+        border-color: #b0bbcc;
+    }
+
+    /* ── Table card ── */
+    .table-wrap {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1.5px solid var(--border);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .table-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .table-count {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 400px; }
+
+    thead {
+        background: var(--accent-light);
+        border-bottom: 1.5px solid #c7d2fe;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        padding: 13px 20px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    td {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
+
+    .group-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .group-avatar {
+        width: 32px; height: 32px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .group-avatar svg { width: 15px; height: 15px; color: #fff; }
+
+    .group-label {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 13.5px;
+    }
+
+    .count-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-light);
+        color: var(--accent);
+        border: 1.5px solid #c7d2fe;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 12px;
+    }
+
+    /* ── Contact name tags in table ── */
+    .contact-names-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .contact-name-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface2);
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 10px 4px 4px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    .contact-name-initial {
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        font-family: 'Syne', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .no-members {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 56px 24px;
+    }
+
+    .empty-icon {
+        width: 52px; height: 52px;
+        background: var(--accent-light);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .empty-icon svg { width: 24px; height: 24px; color: var(--accent); }
+    .empty-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 21, 35, 0.45);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .modal-overlay.open {
+        display: flex;
+        animation: fadeIn 0.18s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 24px 64px rgba(15,21,35,0.18), 0 4px 16px rgba(15,21,35,0.08);
+        animation: slideUp 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(24px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 0;
+        flex-shrink: 0;
+    }
+
+    .modal-header-left { display: flex; align-items: center; gap: 12px; }
+
+    .modal-icon {
+        width: 40px; height: 40px;
+        background: var(--accent-light);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-icon svg { width: 18px; height: 18px; color: var(--accent); }
+
+    .modal-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+    }
+
+    .modal-subtitle { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
+
+    .modal-close {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: background 0.13s, color 0.13s;
+        flex-shrink: 0;
+    }
+
+    .modal-close:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+    .modal-close svg { width: 15px; height: 15px; }
+
+    .modal-body {
+        padding: 20px 24px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 7px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-primary);
+        background: var(--surface);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-input::placeholder { color: #aab4c8; }
+
+    .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(32,63,120,0.1);
+    }
+
+    /* ── Contact checkbox list ── */
+    .contact-search {
+        position: relative;
+        margin-bottom: 8px;
+    }
+
+    .contact-search svg {
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px; height: 14px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
+    .contact-search input {
+        width: 100%;
+        padding: 9px 12px 9px 32px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text-primary);
+        background: var(--surface2);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .contact-search input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(32,63,120,0.1);
+        background: var(--surface);
+    }
+
+    .contact-search input::placeholder { color: #aab4c8; }
+
+    .checkbox-list {
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .checkbox-list::-webkit-scrollbar { width: 4px; }
+    .checkbox-list::-webkit-scrollbar-track { background: transparent; }
+    .checkbox-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        cursor: pointer;
+        transition: background 0.12s;
+        border-bottom: 1px solid var(--border);
+        user-select: none;
+    }
+
+    .checkbox-item:last-child { border-bottom: none; }
+    .checkbox-item:hover { background: var(--accent-light); }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 16px; height: 16px;
+        accent-color: var(--accent);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .checkbox-item-avatar {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        font-family: 'Syne', sans-serif;
+        flex-shrink: 0;
+    }
+
+    .checkbox-item-info { flex: 1; min-width: 0; }
+
+    .checkbox-item-name {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .checkbox-item-email {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .checkbox-item.checked { background: var(--accent-light); }
+
+    .no-contacts-msg {
+        padding: 24px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .selected-count {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--accent);
+        margin-top: 6px;
+    }
+
+    .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1.5px solid var(--border);
+        background: var(--surface2);
+        flex-shrink: 0;
+    }
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title"><span>Groups</span></div>
+            <div class="page-subtitle">Create groups from contacts</div>
+        </div>
+        <button class="btn-primary" id="openModalBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Create Group
+        </button>
+    </div>
+
+    <!-- Groups Table -->
+    <div class="table-wrap">
+        <div class="table-toolbar">
+            <div>
+                <div class="table-title">Group List</div>
+                <div class="table-count">{{ groups|length }} group{{ groups|length|pluralize }}</div>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            {% if groups %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Contacts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td>
+                            <div class="group-name-cell">
+                                <div class="group-avatar">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </div>
+                                <span class="group-label">{{ group.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-names-cell">
+                                {% for contact in group.contacts.all %}
+                                    <span class="contact-name-tag">
+                                        <span class="contact-name-initial">{{ contact.name|first|upper }}</span>
+                                        {{ contact.name }}
+                                    </span>
+                                {% empty %}
+                                    <span class="no-members">No contacts</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <div class="empty-title">No groups yet</div>
+                <div class="empty-sub">Click "Create Group" to organize your contacts.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ── Modal ── -->
+    <div class="modal-overlay" id="groupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="modal-title">New Group</div>
+                        <div class="modal-subtitle">Name your group and pick contacts</div>
+                    </div>
+                </div>
+                <button class="modal-close" id="closeModalBtn" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <!-- Group Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="group-name">Group Name</label>
+                        <input class="form-input" type="text" id="group-name"
+                               name="name" placeholder="e.g. Newsletter Subscribers" required autofocus>
+                    </div>
+
+                    <!-- Contact Picker -->
+                    <div class="form-group">
+                        <label class="form-label">Select Contacts</label>
+
+                        {% if contacts %}
+                        <div class="contact-search">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" id="contactSearch" placeholder="Search contacts…">
+                        </div>
+
+                        <div class="checkbox-list" id="checkboxList">
+                            {% for contact in contacts %}
+                            <label class="checkbox-item" data-name="{{ contact.name|lower }}" data-email="{{ contact.email|lower }}">
+                                <input type="checkbox" name="contacts" value="{{ contact.id }}">
+                                <div class="checkbox-item-avatar">{{ contact.name|first|upper }}</div>
+                                <div class="checkbox-item-info">
+                                    <div class="checkbox-item-name">{{ contact.name }}</div>
+                                    <div class="checkbox-item-email">{{ contact.email }}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <div class="selected-count" id="selectedCount">0 contacts selected</div>
+
+                        {% else %}
+                        <div style="border:1.5px solid var(--border); border-radius:10px;">
+                            <div class="no-contacts-msg">No contacts available. Add contacts first.</div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" type="button" id="cancelModalBtn">Cancel</button>
+                    <button class="btn-primary" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Save Group
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const modal     = document.getElementById('groupModal');
+    const openBtn   = document.getElementById('openModalBtn');
+    const closeBtn  = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+
+    function openModal()  { modal.classList.add('open'); document.getElementById('group-name').focus(); }
+    function closeModal() { modal.classList.remove('open'); }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // Search filter
+    const searchInput = document.getElementById('contactSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase();
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                const name  = item.dataset.name  || '';
+                const email = item.dataset.email || '';
+                item.style.display = (name.includes(q) || email.includes(q)) ? '' : 'none';
+            });
+        });
+    }
+
+    // Selected count + highlight
+    function updateCount() {
+        const checked = document.querySelectorAll('.checkbox-list input[type="checkbox"]:checked').length;
+        const el = document.getElementById('selectedCount');
+        if (el) el.textContent = checked + ' contact' + (checked !== 1 ? 's' : '') + ' selected';
+
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            item.classList.toggle('checked', item.querySelector('input[type="checkbox"]').checked);
+        });
+    }
+
+    document.querySelectorAll('.checkbox-list input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateCount);
+    });
+</script>
+{% endblock %}

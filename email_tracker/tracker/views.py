@@ -1,7 +1,9 @@
+from turtle import delay
+
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
-from .models import EmailTrack
+from .models import EmailTrack,Contact,Group
 import base64
 
 
@@ -226,3 +228,78 @@ def send_email_view(request):
         return HttpResponse(f"Email sent to {email}")
 
     return render(request, "send_email.html")
+
+def contacts_page(request):
+
+    contacts = Contact.objects.all()
+
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+
+        Contact.objects.create(
+            name=name,
+            email=email
+        )
+
+        return redirect("contacts")
+
+    return render(request, "contact.html", {"contacts": contacts})
+
+from .models import Group, Contact
+
+def groups_page(request):
+
+    groups = Group.objects.all()
+    contacts = Contact.objects.all()
+
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        contact_ids = request.POST.getlist("contacts")
+
+        group = Group.objects.create(name=name)
+
+        group.contacts.set(contact_ids)
+
+        return redirect("groups")
+
+    return render(request, "groups.html", {
+        "groups": groups,
+        "contacts": contacts
+    })
+    
+import threading
+import time
+
+def schedule_page(request):
+
+    groups = Group.objects.all()
+
+    return render(request, "schedule.html", {"groups": groups})
+import random
+import time
+def send_group_emails(group_id):
+
+    group = Group.objects.get(id=group_id)
+
+    for contact in group.contacts.all():
+
+        tracking_id = create_tracking(contact.email)
+
+        send_tracking_email(contact.email, tracking_id)
+
+        delay = random.randint(80,120)
+        time.sleep(delay)
+        
+def start_schedule(request, group_id):
+
+    thread = threading.Thread(
+        target=send_group_emails,
+        args=(group_id,)
+    )
+
+    thread.start()
+
+    return HttpResponse("Emails sending started")

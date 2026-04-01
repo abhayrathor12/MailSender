@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule — Email Tracker{% endblock %}
+
+{% block nav_schedule %}active{% endblock %}
+
+{% block extra_styles %}
+
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        color: var(--text-primary);
+    }
+
+    .page-title span { color: var(--accent); }
+
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    /* ── Table card ── */
+    .table-wrap {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1.5px solid var(--border);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .table-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .table-count {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 400px; }
+
+    thead {
+        background: var(--accent-light);
+        border-bottom: 1.5px solid #c7d2fe;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        padding: 13px 20px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    td {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
+
+    /* Group name cell */
+    .group-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .group-avatar {
+        width: 32px; height: 32px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .group-avatar svg { width: 15px; height: 15px; color: #fff; }
+
+    .group-label {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 13.5px;
+    }
+
+    /* ── Contact name tags in table ── */
+    .contact-names-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .contact-name-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface2);
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 10px 4px 4px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    .contact-name-initial {
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        font-family: 'Syne', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .no-members {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Send button */
+    .send-email-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 12.5px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(32,63,120,0.22);
+        transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        white-space: nowrap;
+    }
+
+    .send-email-btn:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 4px 12px rgba(32,63,120,0.32);
+        transform: translateY(-1px);
+    }
+
+    .send-email-btn:active { transform: translateY(0); }
+    .send-email-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 56px 24px;
+    }
+
+    .empty-icon {
+        width: 52px; height: 52px;
+        background: var(--accent-light);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .empty-icon svg { width: 24px; height: 24px; color: var(--accent); }
+    .empty-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title"><span>Schedule</span> Emails</div>
+            <div class="page-subtitle">Send emails to groups</div>
+        </div>
+    </div>
+
+    <!-- Groups Table -->
+    <div class="table-wrap">
+        <div class="table-toolbar">
+            <div>
+                <div class="table-title">Groups</div>
+                <div class="table-count">{{ groups|length }} group{{ groups|length|pluralize }} available</div>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            {% if groups %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Group</th>
+                        <th>Contacts</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td>
+                            <div class="group-name-cell">
+                                <div class="group-avatar">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </div>
+                                <span class="group-label">{{ group.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-names-cell">
+                                {% for contact in group.contacts.all %}
+                                    <span class="contact-name-tag">
+                                        <span class="contact-name-initial">{{ contact.name|first|upper }}</span>
+                                        {{ contact.name }}
+                                    </span>
+                                {% empty %}
+                                    <span class="no-members">No contacts</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="/schedule/send/{{ group.id }}/" class="send-email-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                                Send Emails
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </div>
+                <div class="empty-title">No groups available</div>
+                <div class="empty-sub">Create a group first to start scheduling emails.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

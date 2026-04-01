@@ -1,272 +1,348 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% extends 'base.html' %}
 
-        :root {
-            --bg: #f0f4ff;
-            --surface: #ffffff;
-            --surface2: #f5f7ff;
-            --border: #dde2f0;
-            --text-primary: #0f1523;
-            --text-secondary: #2d3650;
-            --text-muted: #64748b;
-            --green: #15803d;
-            --green-bg: #dcfce7;
-            --green-border: #bbf7d0;
-            --red: #b91c1c;
-            --red-bg: #fee2e2;
-            --red-border: #fecaca;
-            --accent: #203f78;
-            --accent-light: #eef2ff;
-        }
+{% block title %}Dashboard — Email Tracker{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 48px 28px;
-        }
+{% block nav_dashboard %}active{% endblock %}
 
-        .container { max-width: 1280px; margin: 0 auto; }
+{% block extra_styles %}
+    /* ── Stats row ── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
 
-        /* ── Header ── */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 36px;
-        }
+    .stat-card {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        box-shadow: 0 2px 8px rgba(32,63,120,0.05);
+        transition: box-shadow 0.15s, transform 0.15s;
+    }
 
-        .header-left h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.6px;
-            color: var(--text-primary);
-            line-height: 1;
-        }
+    .stat-card:hover {
+        box-shadow: 0 6px 20px rgba(32,63,120,0.1);
+        transform: translateY(-2px);
+    }
 
-        .header-left h1 span { color: var(--accent); }
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+    }
 
-        .header-left p {
-            margin-top: 6px;
-            font-size: 13.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
+    .stat-value {
+        font-family: 'Syne', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+    .stat-sub {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
 
-        .send-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 999px;
-            padding: 9px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(79,70,229,0.25);
-            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-            letter-spacing: 0.1px;
-        }
+    .stat-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
 
-        .send-btn:hover {
-            background: #4338ca;
-            box-shadow: 0 4px 14px rgba(79,70,229,0.35);
-            transform: translateY(-1px);
-        }
+    .stat-icon svg { width: 17px; height: 17px; }
 
-        .send-btn:active { transform: translateY(0); }
+    .stat-icon.blue  { background: #dbeafe; color: #1d4ed8; }
+    .stat-icon.green { background: var(--green-bg); color: var(--green); }
+    .stat-icon.purple{ background: #ede9fe; color: #7c3aed; }
+    .stat-icon.orange{ background: #fff7ed; color: #c2410c; }
 
-        .send-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
 
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff;
-            border: 1.5px solid var(--border);
-            border-radius: 999px;
-            padding: 8px 16px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        }
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        color: var(--text-primary);
+    }
 
-        .live-dot {
-            width: 8px; height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
-            animation: pulse 2s infinite;
-        }
+    .page-title span { color: var(--accent); }
 
-        @keyframes pulse {
-            0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
-            50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
-        }
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+    }
 
-        /* ── Table card ── */
-        .table-wrap {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 24px rgba(79,70,229,0.06), 0 1px 4px rgba(0,0,0,0.04);
-        }
+    .send-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(32,63,120,0.28);
+        transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        text-decoration: none;
+    }
 
-        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .send-btn:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 4px 14px rgba(32,63,120,0.35);
+        transform: translateY(-1px);
+    }
 
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .send-btn:active { transform: translateY(0); }
+    .send-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-        /* ── Head ── */
-        thead {
-            background: var(--accent-light);
-            border-bottom: 1.5px solid #c7d2fe;
-        }
+    .live-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
 
-        th {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            padding: 14px 20px;
-            text-align: left;
-            white-space: nowrap;
-        }
+    .live-dot {
+        width: 8px; height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+        animation: pulse 2s infinite;
+    }
 
-        /* ── Body rows ── */
-        td {
-            font-size: 14px;
-            font-weight: 500;
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-secondary);
-            vertical-align: middle;
-        }
+    @keyframes pulse {
+        0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
+        50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
+    }
 
-        tr:last-child td { border-bottom: none; }
+    /* ── Table card ── */
+    .table-wrap {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(32,63,120,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
 
-        tbody tr { transition: background 0.12s; }
-        tbody tr:hover { background: var(--surface2); }
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1.5px solid var(--border);
+        background: var(--surface);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
 
-        /* Email */
-        td.email-cell {
-            font-weight: 700;
-            color: var(--text-primary);
-            font-size: 13.5px;
-        }
+    .table-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
 
-        /* Pills */
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 999px;
-            white-space: nowrap;
-            letter-spacing: 0.1px;
-        }
+    .table-count {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
 
-        .pill-yes {
-            background: var(--green-bg);
-            color: var(--green);
-            border: 1.5px solid var(--green-border);
-        }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-        .pill-no {
-            background: var(--red-bg);
-            color: var(--red);
-            border: 1.5px solid var(--red-border);
-        }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
 
-        .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        .dot-yes { background: var(--green); }
-        .dot-no  { background: var(--red); }
+    thead {
+        background: var(--accent-light);
+        border-bottom: 1.5px solid #c7d2fe;
+    }
 
-        /* Meta */
-        td.meta {
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 12.5px;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
+    th {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        padding: 13px 20px;
+        text-align: left;
+        white-space: nowrap;
+    }
 
-        td.ua {
-            font-size: 13px;
-            font-weight: 500;
-            max-width: 170px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-muted);
-        }
+    td {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
 
-        td.open-type {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent);
-        }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
 
-        @media (max-width: 600px) {
-            body { padding: 24px 14px; }
-            header { flex-direction: column; align-items: flex-start; }
-            .header-left h1 { font-size: 26px; }
-        }
-    </style>
-</head>
-<body>
+    td.email-cell {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 13.5px;
+    }
 
-<div class="container">
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+        letter-spacing: 0.1px;
+    }
 
-    <header>
-        <div class="header-left">
-            <h1>Email <span>Tracker</span></h1>
-            <p>Delivery · Open · Click analytics</p>
+    .pill-yes {
+        background: var(--green-bg);
+        color: var(--green);
+        border: 1.5px solid var(--green-border);
+    }
+
+    .pill-no {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1.5px solid var(--red-border);
+    }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-yes { background: var(--green); }
+    .dot-no  { background: var(--red); }
+
+    td.meta {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    td.ua {
+        font-size: 13px;
+        font-weight: 500;
+        max-width: 170px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-muted);
+    }
+
+    td.open-type {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .stats-row { grid-template-columns: 1fr 1fr; }
+    }
+{% endblock %}
+
+{% block content %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title"><span>Dashboard</span></div>
+            <div class="page-subtitle">All delivery, open & click events</div>
         </div>
-       <div class="header-right">
-    <a href="{% url 'send' %}">
-        <button class="send-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"/>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-            Send Mail
-        </button>
-    </a>
-
-    <div class="live-badge">
-        <span class="live-dot"></span>
-        Live Dashboard
     </div>
-</div>
-    </header>
 
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="3"/><polyline points="2,4 12,14 22,4"/>
+                </svg>
+            </div>
+            <div class="stat-label">Total Sent</div>
+            <div class="stat-value">{{ data|length }}</div>
+            <div class="stat-sub">emails tracked</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="stat-label">Delivered</div>
+            <div class="stat-value">{{ data|length }}</div>
+            <div class="stat-sub">successful deliveries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <div class="stat-label">Opened</div>
+            <div class="stat-value">—</div>
+            <div class="stat-sub">unique opens</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+            </div>
+            <div class="stat-label">Clicked</div>
+            <div class="stat-value">—</div>
+            <div class="stat-sub">link clicks</div>
+        </div>
+    </div>
+
+    <!-- Table -->
     <div class="table-wrap">
+        <div class="table-toolbar">
+            <div>
+                <div class="table-title">Tracking Log</div>
+                <div class="table-count">{{ data|length }} record{{ data|length|pluralize }}</div>
+            </div>
+        </div>
         <div class="table-scroll">
             <table>
                 <thead>
@@ -325,7 +401,4 @@
         </div>
     </div>
 
-</div>
-
-</body>
-</html>
+{% endblock %}

@@ -8,4 +8,13 @@ urlpatterns = [
     path('', views.dashboard,name='dashboard'),
     path('send-email/', views.send_email_view),
     path("send/", views.send_email_view, name="send"),
+    path("contacts/", views.contacts_page, name="contacts"),
+
+    path("groups/", views.groups_page, name="groups"),
+
+    path("schedule/", views.schedule_page, name="schedule"),
+
+    path("schedule/send/<int:group_id>/",
+         views.start_schedule,
+         name="start_schedule"),
 ]
