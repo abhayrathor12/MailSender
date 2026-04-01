@@ -346,7 +346,7 @@
             const resp = await fetch(`/schedule/send/${groupId}/`);
             const data = await resp.json();
 
-            if (resp.ok && data.status === 'started') {
+            if (resp.ok && data.status === 'done') {
                 showPopup('success', data.message);
             } else if (resp.status === 409) {
                 showPopup('busy', data.message);

@@ -205,11 +205,25 @@ def start_schedule(request, group_id):
             return JsonResponse({"status": "error", "message": "Group not found."}, status=404)
 
         _is_sending = True
-        thread = threading.Thread(target=send_group_emails, args=(group_id, group.name))
-        thread.daemon = True
-        thread.start()
+
+    # Run synchronously — response only returns after ALL emails are sent
+    try:
+        for contact in group.contacts.all():
+            tracking_id = create_tracking(contact.email)
+            send_tracking_email(contact.email, tracking_id)
+            delay = random.randint(80, 120)
+            time.sleep(delay)
 
         return JsonResponse({
-            "status": "started",
-            "message": f"Emails for group \"{group.name}\" are now being sent."
+            "status": "done",
+            "message": f"All emails for group \"{group.name}\" have been sent successfully."
         })
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "message": f"Something went wrong: {str(e)}"
+        }, status=500)
+
+    finally:
+        _is_sending = False
