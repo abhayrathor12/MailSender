@@ -180,11 +180,14 @@ def send_group_emails(group_id, group_name):
     global _is_sending
     try:
         group = Group.objects.get(id=group_id)
+
         for contact in group.contacts.all():
             tracking_id = create_tracking(contact.email)
             send_tracking_email(contact.email, tracking_id)
-            delay = random.randint(80, 120)
+
+            delay = random.randint(15, 40)
             time.sleep(delay)
+
     finally:
         _is_sending = False
 
@@ -202,28 +205,27 @@ def start_schedule(request, group_id):
         try:
             group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Group not found."}, status=404)
+            return JsonResponse({
+                "status": "error",
+                "message": "Group not found."
+            }, status=404)
 
         _is_sending = True
 
-    # Run synchronously — response only returns after ALL emails are sent
-    try:
-        for contact in group.contacts.all():
-            tracking_id = create_tracking(contact.email)
-            send_tracking_email(contact.email, tracking_id)
-            delay = random.randint(80, 120)
-            time.sleep(delay)
+        # Start background thread
+        thread = threading.Thread(
+            target=send_group_emails,
+            args=(group_id, group.name),
+            daemon=True
+        )
+        thread.start()
 
-        return JsonResponse({
-            "status": "done",
-            "message": f"All emails for group \"{group.name}\" have been sent successfully."
-        })
-
-    except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Something went wrong: {str(e)}"
-        }, status=500)
-
-    finally:
-        _is_sending = False
+    return JsonResponse({
+        "status": "started",
+        "message": f"Emails for group \"{group.name}\" are being sent."
+    })
+    
+def sending_status(request):
+    return JsonResponse({
+        "sending": _is_sending
+    })

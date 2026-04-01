@@ -17,4 +17,5 @@ urlpatterns = [
     path("schedule/send/<int:group_id>/",
          views.start_schedule,
          name="start_schedule"),
+    path("schedule/status/", views.sending_status, name="sending_status"),
 ]

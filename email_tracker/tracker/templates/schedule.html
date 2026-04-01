@@ -313,66 +313,53 @@
     </div>
 {% block extra_scripts %}
 <script>
-    let globalSending = false;   /* client-side guard */
+   
 
     async function handleSend(btn) {
-        if (globalSending) {
-            showPopup('busy', 'Please wait — another group is already sending emails.');
-            return;
+
+    const groupId   = btn.dataset.groupId;
+    const groupName = btn.dataset.groupName;
+
+    /* disable only this button */
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Sending…
+    `;
+
+    try {
+        const resp = await fetch(`/schedule/send/${groupId}/`);
+        const data = await resp.json();
+
+        if (resp.ok && data.status === "started") {
+            showPopup("success", data.message);
+        } else if (resp.status === 409) {
+            showPopup("busy", data.message);
+        } else {
+            showPopup("error", data.message || "Unexpected error");
         }
 
-        const groupId   = btn.dataset.groupId;
-        const groupName = btn.dataset.groupName;
-
-        /* Disable ALL send buttons and mark this one as "Sending…" */
-        globalSending = true;
-        document.querySelectorAll('.send-email-btn').forEach(b => {
-            b.disabled = true;
-            b.style.opacity = '0.5';
-            b.style.cursor  = 'not-allowed';
-        });
-
-        btn.style.opacity = '1';
-        btn.style.cursor  = 'default';
-        btn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-            </svg>
-            Sending…
-        `;
-
-        try {
-            const resp = await fetch(`/schedule/send/${groupId}/`);
-            const data = await resp.json();
-
-            if (resp.ok && data.status === 'done') {
-                showPopup('success', data.message);
-            } else if (resp.status === 409) {
-                showPopup('busy', data.message);
-            } else {
-                showPopup('error', data.message || 'An unexpected error occurred.');
-            }
-        } catch (err) {
-            showPopup('error', 'Network error. Please try again.');
-        } finally {
-            /* Re-enable all buttons and restore original label */
-            globalSending = false;
-            document.querySelectorAll('.send-email-btn').forEach(b => {
-                b.disabled = false;
-                b.style.opacity = '';
-                b.style.cursor  = '';
-            });
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"/>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-                Send Emails
-            `;
-        }
+    } catch (err) {
+        showPopup("error", "Network error");
     }
+
+    btn.disabled = false;
+    btn.style.opacity = '';
+
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Send Emails
+    `;
+}
 </script>
 
 <style>

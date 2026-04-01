@@ -479,6 +479,39 @@
         /* expose globally so schedule.html (and any page) can call it */
         window.showPopup  = showPopup;
         window.closePopup = closePopup;
+
+      
+
+let emailWasSending = false;
+
+async function checkEmailStatus() {
+
+    try {
+        const resp = await fetch("/schedule/status/");
+        const data = await resp.json();
+
+        if (data.sending) {
+            emailWasSending = true;
+        }
+
+        if (!data.sending && emailWasSending) {
+
+            showPopup(
+                "success",
+                "All emails have been delivered successfully."
+            );
+
+            emailWasSending = false;
+        }
+
+    } catch (err) {
+        console.log("status check failed");
+    }
+}
+
+setInterval(checkEmailStatus, 5000);
+
+
     </script>
 
     {% block extra_scripts %}{% endblock %}
