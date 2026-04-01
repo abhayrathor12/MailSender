@@ -254,15 +254,46 @@
         color: var(--text-muted);
     }
 
-    td.ua {
-        font-size: 12.5px;
-        font-weight: 500;
-        max-width: 160px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: var(--text-muted);
-    }
+   td.ua {
+    /* replace your existing td.ua rule with this */
+    font-size: 12.5px;
+    font-weight: 500;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-muted);
+    position: relative;
+    cursor: default;
+}
+
+td.ua::after {
+    content: attr(data-ua);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: normal;
+    width: max-content;
+    max-width: 320px;
+    line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 99;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+td.ua:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+}
 
     td.open-type {
         font-size: 12.5px;
@@ -524,7 +555,7 @@
                         <td class="meta">${item.delivered_at || ""}</td>
                         <td class="meta">${item.opened_at || ""}</td>
                         <td class="meta">${item.clicked_at || ""}</td>
-                        <td class="ua">${item.user_agent || ""}</td>
+                        <td class="ua" data-ua="${item.user_agent || ''}">${item.user_agent || ""}</td>
                         <td class="meta">${item.ip_address || ""}</td>
                         <td class="open-type">${item.open_type || ""}</td>
                     </tr>
@@ -546,7 +577,7 @@
 
     loadDashboard();
 
-    setInterval(loadDashboard, 5000);
+    setInterval(loadDashboard, 10000);
 
 })();
 </script>
