@@ -138,6 +138,14 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+# BASE_URL = "https://0650-122-180-247-129.ngrok-free.app "
+
+
+from django.conf import settings
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 BASE_URL = "https://sendermailing.pythonanywhere.com"
 
 
@@ -148,49 +156,48 @@ def send_tracking_email(to_email, tracking_id):
 <html>
 <body>
 <p>Hello,</p>
-
-<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com">
-Open Link
-</a>
-
-<img src="{BASE_URL}/track/open/{tracking_id}/" width="1" height="1">
-
+<p>Check this out:</p>
+<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com" target="_blank">Open Link</a>
+<p style="font-size:0;">
+<img src="{BASE_URL}/track/open/{tracking_id}/?t={uuid.uuid4()}" width="1" height="1" style="display:none;">
+</p>
+<div style="background-image:url('{BASE_URL}/track/open/{tracking_id}/?bg={uuid.uuid4()}'); width:1px; height:1px;"></div>
 </body>
 </html>
 """
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = "your_email@gmail.com"
+    msg["From"] = settings.EMAIL_HOST_USER
     msg["To"] = to_email
 
     msg.attach(MIMEText(html_content, "html"))
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
         server.starttls()
 
-        server.login("your_email@gmail.com", "your_app_password")
+        server.login(
+            settings.EMAIL_HOST_USER,
+            settings.EMAIL_HOST_PASSWORD.replace(" ", "")
+        )
 
         response = server.sendmail(
-            "your_email@gmail.com",
+            settings.EMAIL_HOST_USER,
             [to_email],
             msg.as_string()
         )
 
         server.quit()
 
-        # response {} means accepted by mail server
-        obj = EmailTrack.objects.get(tracking_id=tracking_id)
-
         if response == {}:
+            obj = EmailTrack.objects.get(tracking_id=tracking_id)
             obj.delivered = True
             obj.delivered_at = timezone.now()
             obj.save()
 
     except Exception as e:
         print("SMTP Error:", e)
-
 from django.shortcuts import render
 
 
