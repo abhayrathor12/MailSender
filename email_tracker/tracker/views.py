@@ -18,11 +18,12 @@ _is_sending = False
 
 def get_email_status(user_agent, ip):
     ua = (user_agent or "").lower()
+
     if "googleimageproxy" in ua or "ggpht.com" in ua:
         return "opened"
+
     if ip.startswith("74.125."):
         return "opened"
-    return "opened"
 
 
 def get_pixel():
