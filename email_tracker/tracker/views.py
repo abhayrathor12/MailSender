@@ -18,8 +18,6 @@ _is_sending = False
 
 def get_email_status(user_agent, ip):
     ua = (user_agent or "").lower()
-    if "chrome/42" in ua and "edge/12" in ua and ip.startswith("209.85."):
-        return "delivered"
     if "googleimageproxy" in ua or "ggpht.com" in ua:
         return "opened"
     if ip.startswith("74.125."):
@@ -134,32 +132,64 @@ def dashboard_data(request):
     return JsonResponse({"data": data})
 
 
-from django.core.mail import EmailMultiAlternatives
+
 from django.utils.html import strip_tags
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 BASE_URL = "https://sendermailing.pythonanywhere.com"
 
 
 def send_tracking_email(to_email, tracking_id):
     subject = "Test Tracking"
+
     html_content = f"""
 <html>
 <body>
 <p>Hello,</p>
-<p>Check this out:</p>
-<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com" target="_blank">Open Link</a>
-<p style="font-size:0;">
-<img src="{BASE_URL}/track/open/{tracking_id}/?t={uuid.uuid4()}" width="1" height="1" style="display:none;">
-</p>
-<div style="background-image:url('{BASE_URL}/track/open/{tracking_id}/?bg={uuid.uuid4()}'); width:1px; height:1px;"></div>
+
+<a href="{BASE_URL}/track/click/{tracking_id}?url=https://google.com">
+Open Link
+</a>
+
+<img src="{BASE_URL}/track/open/{tracking_id}/" width="1" height="1">
+
 </body>
 </html>
 """
-    text_content = strip_tags(html_content)
-    email = EmailMultiAlternatives(subject, text_content, "your_email@gmail.com", [to_email])
-    email.attach_alternative(html_content, "text/html")
-    email.send()
 
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = "your_email@gmail.com"
+    msg["To"] = to_email
+
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+
+        server.login("your_email@gmail.com", "your_app_password")
+
+        response = server.sendmail(
+            "your_email@gmail.com",
+            [to_email],
+            msg.as_string()
+        )
+
+        server.quit()
+
+        # response {} means accepted by mail server
+        obj = EmailTrack.objects.get(tracking_id=tracking_id)
+
+        if response == {}:
+            obj.delivered = True
+            obj.delivered_at = timezone.now()
+            obj.save()
+
+    except Exception as e:
+        print("SMTP Error:", e)
 
 from django.shortcuts import render
 
